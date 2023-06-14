@@ -1,9 +1,7 @@
 package com.howtodoinjava.app.web;
 
-import com.howtodoinjava.app.auth.User;
 import com.howtodoinjava.app.model.Employee;
 import com.howtodoinjava.app.repository.EmployeeRepository;
-import io.dropwizard.auth.Auth;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.ConstraintViolation;
@@ -37,14 +35,14 @@ public class EmployeeController {
 
   @GET
   @PermitAll
-  public Response getEmployees(@Auth User user) {
+  public Response getEmployees() {
     return Response.ok(repository.getEmployees()).build();
   }
 
   @GET
   @Path("/{id}")
   @PermitAll
-  public Response getEmployeeById(@PathParam("id") Integer id, @Auth User user) {
+  public Response getEmployeeById(@PathParam("id") Integer id) {
     Employee employee = repository.getEmployee(id);
     if (employee != null) {
       return Response.ok(employee).build();
@@ -55,7 +53,7 @@ public class EmployeeController {
 
   @POST
   @RolesAllowed({"ADMIN"})
-  public Response createEmployee(Employee employee, @Auth User user) throws URISyntaxException {
+  public Response createEmployee(Employee employee) throws URISyntaxException {
     // validation
     Set<ConstraintViolation<Employee>> violations = validator.validate(employee);
     Employee e = repository.getEmployee(employee.getId());
@@ -79,7 +77,7 @@ public class EmployeeController {
   @PUT
   @Path("/{id}")
   @PermitAll
-  public Response updateEmployeeById(@PathParam("id") Integer id, Employee employee, @Auth User user) {
+  public Response updateEmployeeById(@PathParam("id") Integer id, Employee employee) {
     // validation
     Set<ConstraintViolation<Employee>> violations = validator.validate(employee);
     Employee e = repository.getEmployee(employee.getId());
@@ -103,7 +101,7 @@ public class EmployeeController {
   @DELETE
   @Path("/{id}")
   @RolesAllowed({"ADMIN"})
-  public Response removeEmployeeById(@PathParam("id") Integer id, @Auth User user) {
+  public Response removeEmployeeById(@PathParam("id") Integer id) {
     Employee employee = repository.getEmployee(id);
     if (employee != null) {
       repository.removeEmployee(id);
