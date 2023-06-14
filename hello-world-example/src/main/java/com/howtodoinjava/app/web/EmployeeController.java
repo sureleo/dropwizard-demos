@@ -1,9 +1,8 @@
 package com.howtodoinjava.app.web;
 
+import com.howtodoinjava.app.App;
 import com.howtodoinjava.app.model.Employee;
 import com.howtodoinjava.app.repository.EmployeeRepository;
-import jakarta.annotation.security.PermitAll;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import jakarta.ws.rs.DELETE;
@@ -16,6 +15,9 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ import java.util.Set;
 @Path("/employees")
 @Produces(MediaType.APPLICATION_JSON)
 public class EmployeeController {
+  private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
   private Validator validator;
   private EmployeeRepository repository;
@@ -34,14 +37,12 @@ public class EmployeeController {
   }
 
   @GET
-  @PermitAll
   public Response getEmployees() {
     return Response.ok(repository.getEmployees()).build();
   }
 
   @GET
   @Path("/{id}")
-  @PermitAll
   public Response getEmployeeById(@PathParam("id") Integer id) {
     Employee employee = repository.getEmployee(id);
     if (employee != null) {
@@ -52,7 +53,6 @@ public class EmployeeController {
   }
 
   @POST
-  @RolesAllowed({"ADMIN"})
   public Response createEmployee(Employee employee) throws URISyntaxException {
     // validation
     Set<ConstraintViolation<Employee>> violations = validator.validate(employee);
@@ -76,7 +76,6 @@ public class EmployeeController {
 
   @PUT
   @Path("/{id}")
-  @PermitAll
   public Response updateEmployeeById(@PathParam("id") Integer id, Employee employee) {
     // validation
     Set<ConstraintViolation<Employee>> violations = validator.validate(employee);
@@ -100,7 +99,6 @@ public class EmployeeController {
 
   @DELETE
   @Path("/{id}")
-  @RolesAllowed({"ADMIN"})
   public Response removeEmployeeById(@PathParam("id") Integer id) {
     Employee employee = repository.getEmployee(id);
     if (employee != null) {

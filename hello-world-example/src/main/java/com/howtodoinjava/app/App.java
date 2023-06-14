@@ -2,6 +2,7 @@ package com.howtodoinjava.app;
 
 import com.howtodoinjava.app.config.ApplicationConfiguration;
 import com.howtodoinjava.app.config.ApplicationHealthCheck;
+import com.howtodoinjava.app.logger.LoggingRequestFilter;
 import com.howtodoinjava.app.repository.EmployeeRepository;
 import com.howtodoinjava.app.web.APIController;
 import com.howtodoinjava.app.web.EmployeeController;
@@ -35,6 +36,8 @@ public class App extends Application<ApplicationConfiguration> {
 
     LOGGER.info("Registering Application Health Check");
     e.healthChecks().register("application", new ApplicationHealthCheck(client));
+
+    e.jersey().register(new LoggingRequestFilter());
   }
 
   public static void main(String[] args) throws Exception {
