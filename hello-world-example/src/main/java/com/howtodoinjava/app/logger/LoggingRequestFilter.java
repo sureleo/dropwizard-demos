@@ -1,5 +1,7 @@
 package com.howtodoinjava.app.logger;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.howtodoinjava.app.model.Employee;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.ext.Provider;
@@ -10,7 +12,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-
 
 @Provider
 public class LoggingRequestFilter implements ContainerRequestFilter {
@@ -26,6 +27,11 @@ public class LoggingRequestFilter implements ContainerRequestFilter {
         InputStream requestBody = requestContext.getEntityStream();
         String requestBodyString = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
         LOGGER.info(requestBodyString);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Employee e = objectMapper.readValue(requestBodyString, Employee.class);
+
+        LOGGER.info(e.toString());
 
         // Set the request body back to the input stream so it can be consumed by the resource
         requestContext.setEntityStream(new ByteArrayInputStream(requestBodyString.getBytes()));
