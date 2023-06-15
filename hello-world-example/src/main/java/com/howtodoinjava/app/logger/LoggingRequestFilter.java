@@ -27,8 +27,8 @@ public class LoggingRequestFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) throws IOException {
         String method = requestContext.getMethod();
         String path = requestContext.getUriInfo().getPath();
-        String requestToReplay = "{\"method\": \"%s\", \"path\": \"%s\", \"body\": %s }";
-        String body = "\"\"";
+        String requestToReplay = "%s;%s;%s";
+        String body = "";
 
         InputStream requestBody = requestContext.getEntityStream();
         String requestBodyString = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);

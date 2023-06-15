@@ -2,23 +2,19 @@
     <!-- Existing configuration -->
 
     <Appenders>
-        <!-- TODO: create a pattern that does not log metadata -->
-        <!-- i.e. This should be just 2023-06-15 13:37:49,760 [dw-38 - POST /employees] INFO  com.howtodoinjava.app.logger.LoggingRequestFilter - {"method": "POST", "path": "employees", "body": {"id":2,"firstName":"Shuo","lastName":"Li","email":"Obfuscated@Obfuscated.com"} } -->
-        <!-- i.e. {"method": "POST", "path": "employees", "body": {"id":2,"firstName":"Shuo","lastName":"Li","email":"Obfuscated@Obfuscated.com"} } -->
-        <!-- So no parsing log is required-->
-
         <!-- TODO: log file name should be YYYY-mm-DD-hhtimezone.request.log -->
         <!-- TODO: better to have auto rotate so we don't stress local storage: https://howtodoinjava.com/log4j2/log4j2-xml-configuration-example/-->
-        <File name="FileAppender" fileName="./logs/request.log">
-            <PatternLayout pattern="%d [%t] %-5level %logger{36} - %msg%n" />
+        <File name="RequestLogFileAppender" fileName="./logs/request.log">
+            <PatternLayout pattern="%msg%n" />
         </File>
     </Appenders>
 
     <Loggers>
         <!-- Existing loggers -->
 
-        <Logger name="com.howtodoinjava.app.logger.LoggingRequestFilter" level="debug" additivity="false">
-            <AppenderRef ref="FileAppender" />
+        <Logger name="com.howtodoinjava.app.logger.LoggingRequestFilter" level="info" additivity="false">
+            <AppenderRef ref="RequestLogFileAppender" />
+            <AppenderRef ref="Console" />
         </Logger>
 
         <!-- Root logger configuration -->
