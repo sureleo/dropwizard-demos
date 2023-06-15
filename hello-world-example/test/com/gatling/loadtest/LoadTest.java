@@ -5,6 +5,9 @@ import static io.gatling.javaapi.http.HttpDsl.*;
 
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * This sample is based on our official tutorials:
@@ -15,8 +18,8 @@ import io.gatling.javaapi.http.*;
  */
 public class LoadTest extends Simulation {
 
-    FeederBuilder<String> feeder = csv("com/gatling/resources/search.csv").random();
-
+    FeederBuilder<String> feeder = ssv("com/gatling/resources/load-test.csv").random();
+    // todo generate these test classes based on the input format
     HttpProtocolBuilder httpProtocol =
         http.baseUrl("http://0.0.0.0:8080")
             .acceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
@@ -26,24 +29,21 @@ public class LoadTest extends Simulation {
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:16.0) Gecko/20100101 Firefox/16.0"
             );
     //
-    //ChainBuilder search =
-    //    exec(http("Home").get("/"))
-    //        .pause(1)
-    //        .feed(feeder)
-    //        .exec(
-    //            http("Search")
-    //                .get("/computers?f=#{searchCriterion}")
-    //                .check(
-    //                    css("a:contains('#{searchComputerName}')", "href").saveAs("computerUrl")
-    //                )
-    //        )
-    //        .pause(1)
-    //        .exec(
-    //            http("Select")
-    //                .get("#{computerUrl}")
-    //                .check(status().is(200))
-    //        )
-    //        .pause(1);
+    ChainBuilder edit =
+        tryMax(2).on(
+            feed(feeder)
+            .exec(
+                http("Post")
+                    .post("/employees")
+                    .header(HttpHeaderNames.CONTENT_TYPE, String.valueOf(HttpHeaderValues.APPLICATION_JSON))
+                    .body(StringBody("#{body}"))
+                    .check(
+                        status().is(201)
+                    )
+            )
+            .pause(1)
+            .exitHereIfFailed()
+        );
 
     // repeat is a loop resolved at RUNTIME
     ChainBuilder browse =
@@ -56,40 +56,7 @@ public class LoadTest extends Simulation {
             ).pause(1)
         );
 
-    // Note we should be using a feeder here
-    // let's demonstrate how we can retry: let's make the request fail randomly and retry a given
-    // number of times
-    //
-    //ChainBuilder edit =
-    //    // let's try at max 2 times
-    //    tryMax(2)
-    //        .on(
-    //            exec(
-    //                http("Form")
-    //                    .get("/computers/new")
-    //            )
-    //                .pause(1)
-    //                .exec(
-    //                    http("Post")
-    //                        .post("/computers")
-    //                        .formParam("name", "Beautiful Computer")
-    //                        .formParam("introduced", "2012-05-30")
-    //                        .formParam("discontinued", "")
-    //                        .formParam("company", "37")
-    //                        .check(
-    //                            status().is(
-    //                                // we do a check on a condition that's been customized with
-    //                                // a lambda. It will be evaluated every time a user executes
-    //                                // the request
-    //                                session -> 200 + ThreadLocalRandom.current().nextInt(2)
-    //                            )
-    //                        )
-    //                )
-    //        )
-    //        // if the chain didn't finally succeed, have the user exit the whole scenario
-    //        .exitHereIfFailed();
-
-    ScenarioBuilder users = scenario("Users").exec(browse);
+    ScenarioBuilder users = scenario("Users").exec(browse, edit);
     //ScenarioBuilder admins = scenario("Admins").exec(search, browse, edit);
 
     {
