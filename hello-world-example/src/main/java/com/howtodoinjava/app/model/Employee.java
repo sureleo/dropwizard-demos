@@ -14,6 +14,7 @@ import org.hibernate.validator.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@JsonDeserialize(using = EmployeeCustomDeserializer.class)
 public class Employee {
 
   @NotNull

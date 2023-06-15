@@ -27,13 +27,9 @@ public class LoggingRequestFilter implements ContainerRequestFilter {
         if (!method.equals("GET")) {
             InputStream requestBody = requestContext.getEntityStream();
             String requestBodyString = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
-            LOGGER.info(requestBodyString);
-
             ObjectMapper objectMapper = new ObjectMapper();
-
             Employee e = objectMapper.readValue(requestBodyString, Employee.class);
-
-            LOGGER.info(e.toString());
+            LOGGER.info(objectMapper.writeValueAsString(e));
 
             // Set the request body back to the input stream so it can be consumed by the resource
             requestContext.setEntityStream(new ByteArrayInputStream(requestBodyString.getBytes()));
