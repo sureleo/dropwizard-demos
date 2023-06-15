@@ -4,9 +4,16 @@
     <Appenders>
         <!-- TODO: log file name should be YYYY-mm-DD-hhtimezone.request.log -->
         <!-- TODO: better to have auto rotate so we don't stress local storage: https://howtodoinjava.com/log4j2/log4j2-xml-configuration-example/-->
-        <File name="RequestLogFileAppender" fileName="./logs/request.log">
-            <PatternLayout pattern="%msg%n" />
-        </File>
+        <RollingFile name="RequestLogFileAppender" fileName="./logs/request.log"
+                     filePattern="./logs/request-%d{MM-dd-yyyy}.log.gz">
+            <PatternLayout>
+                <Pattern>%msg%n</Pattern>
+                <Header>METHOD;PATH;BODY%n</Header>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
     </Appenders>
 
     <Loggers>
