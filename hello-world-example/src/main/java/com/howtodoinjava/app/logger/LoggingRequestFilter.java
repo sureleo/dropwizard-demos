@@ -22,6 +22,8 @@ public class LoggingRequestFilter implements ContainerRequestFilter {
         String method = requestContext.getMethod();
         String path = requestContext.getUriInfo().getPath();
         LOGGER.info("Received request - Method: {}, Path: {}", method, path);
+        String requestToReplay = "{\"method\": \"%s\", \"path\": \"%s\", \"body\": %s }";
+        String body = "";
 
         // Log the request body
         if (!method.equals("GET")) {
@@ -29,10 +31,12 @@ public class LoggingRequestFilter implements ContainerRequestFilter {
             String requestBodyString = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
             ObjectMapper objectMapper = new ObjectMapper();
             Employee e = objectMapper.readValue(requestBodyString, Employee.class);
-            LOGGER.info(objectMapper.writeValueAsString(e));
+            body = objectMapper.writeValueAsString(e);
 
             // Set the request body back to the input stream so it can be consumed by the resource
             requestContext.setEntityStream(new ByteArrayInputStream(requestBodyString.getBytes()));
         }
+
+        LOGGER.info(String.format(requestToReplay, method, path, body));
     }
 }
