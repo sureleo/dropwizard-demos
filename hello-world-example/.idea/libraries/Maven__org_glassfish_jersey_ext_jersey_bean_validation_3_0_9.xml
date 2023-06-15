@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.glassfish.jersey.ext:jersey-bean-validation:3.0.9">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/jersey/ext/jersey-bean-validation/3.0.9/jersey-bean-validation-3.0.9.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/jersey/ext/jersey-bean-validation/3.0.9/jersey-bean-validation-3.0.9-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/jersey/ext/jersey-bean-validation/3.0.9/jersey-bean-validation-3.0.9-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

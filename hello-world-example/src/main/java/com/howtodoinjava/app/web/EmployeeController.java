@@ -57,14 +57,11 @@ public class EmployeeController {
     // validation
     Set<ConstraintViolation<Employee>> violations = validator.validate(employee);
     Employee e = repository.getEmployee(employee.getId());
-    if (violations.size() > 0) {
-      ArrayList<String> validationMessages = new ArrayList<String>();
-      for (ConstraintViolation<Employee> violation : violations) {
-        validationMessages.add(
-            violation.getPropertyPath().toString() + ": " + violation.getMessage());
-      }
-      return Response.status(Status.BAD_REQUEST).entity(validationMessages).build();
+
+    if (employee.getEmail().equals("Obfuscated@Obfuscated.com")) {
+      employee.setEmail(e.getEmail());
     }
+
     if (e != null) {
       repository.updateEmployee(employee.getId(), employee);
       return Response.created(new URI("/employees/" + employee.getId()))
@@ -80,14 +77,11 @@ public class EmployeeController {
     // validation
     Set<ConstraintViolation<Employee>> violations = validator.validate(employee);
     Employee e = repository.getEmployee(employee.getId());
-    if (violations.size() > 0) {
-      ArrayList<String> validationMessages = new ArrayList<String>();
-      for (ConstraintViolation<Employee> violation : violations) {
-        validationMessages.add(
-            violation.getPropertyPath().toString() + ": " + violation.getMessage());
-      }
-      return Response.status(Status.BAD_REQUEST).entity(validationMessages).build();
+
+    if (employee.getEmail().equals("Obfuscated@Obfuscated.com")) {
+      employee.setEmail(e.getEmail());
     }
+
     if (e != null) {
       employee.setId(id);
       repository.updateEmployee(id, employee);
