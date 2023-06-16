@@ -7,7 +7,7 @@ import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
-import java.util.concurrent.ThreadLocalRandom;
+
 
 /**
  * This sample is based on our official tutorials:
@@ -17,6 +17,29 @@ import java.util.concurrent.ThreadLocalRandom;
  * </ul>
  */
 public class LoadTest extends Simulation {
+    public ActionBuilder createHttpRequest (String method, String path, String body)
+    {
+        if ("POST".equalsIgnoreCase(method)) {
+            return http("Post")
+                .post("/"+path)
+                .header(HttpHeaderNames.CONTENT_TYPE, String.valueOf(HttpHeaderValues.APPLICATION_JSON))
+                .body(StringBody(body))
+                .check(
+                    status().is(201)
+                );
+        }
+        else if ("GET".equalsIgnoreCase(method)) {
+            return http("list employees")
+                .get("/"+path)
+                .check(status().is(200));
+        }
+        else {
+            return http("default list employees")
+                .get("/"+path)
+                .check(status().is(200));
+        }
+    }
+
 
     FeederBuilder<String> feeder = ssv("com/gatling/resources/load-test.csv").random();
     // todo generate these test classes based on the input format
@@ -28,18 +51,19 @@ public class LoadTest extends Simulation {
             .userAgentHeader(
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:16.0) Gecko/20100101 Firefox/16.0"
             );
-    //
+
     ChainBuilder edit =
         tryMax(2).on(
             feed(feeder)
             .exec(
-                http("Post")
-                    .post("/employees")
-                    .header(HttpHeaderNames.CONTENT_TYPE, String.valueOf(HttpHeaderValues.APPLICATION_JSON))
-                    .body(StringBody("#{BODY}"))
-                    .check(
-                        status().is(201)
-                    )
+                createHttpRequest("#{METHOD}", "#{PATH}", "#{BODY}")
+                //http("Post")
+                //    .post("/employees")
+                //    .header(HttpHeaderNames.CONTENT_TYPE, String.valueOf(HttpHeaderValues.APPLICATION_JSON))
+                //    .body(StringBody("#{BODY}"))
+                //    .check(
+                //        status().is(201)
+                //    )
             )
             .pause(1)
             .exitHereIfFailed()
@@ -56,12 +80,12 @@ public class LoadTest extends Simulation {
             ).pause(1)
         );
 
-    ScenarioBuilder users = scenario("Users").exec(browse, edit);
+    ScenarioBuilder users = scenario("Users").exec(edit);
     //ScenarioBuilder admins = scenario("Admins").exec(search, browse, edit);
 
     {
         setUp(
-            users.injectOpen(rampUsers(2).during(10))
+            users.injectOpen(rampUsers(2).during(30))
             //admins.injectOpen(rampUsers(2).during(10))
         ).protocols(httpProtocol);
     }

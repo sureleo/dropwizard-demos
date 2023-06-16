@@ -1,4 +1,7 @@
-body
-{"id":1,"firstName":"Shuo","lastName":"Li","email":"Obfuscated@Obfuscated.com"}
-{"id":2,"firstName":"Zi","lastName":"Yin","email":"Obfuscated@Obfuscated.com"}
-{"id":3,"firstName":"Jane","lastName":"Doe","email":"Obfuscated@Obfuscated.com"}
+METHOD;PATH;BODY
+GET;employees/3;
+GET;employees/3;
+GET;employees;
+POST;employees;{"id":1,"firstName":"Shuo","lastName":"Li","email":"Obfuscated@Obfuscated.com"}
+POST;employees;{"id":2,"firstName":"Zi","lastName":"Yin","email":"Obfuscated@Obfuscated.com"}
+POST;employees;{"id":3,"firstName":"Jane","lastName":"Doe","email":"Obfuscated@Obfuscated.com"}
