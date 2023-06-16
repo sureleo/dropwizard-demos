@@ -1,12 +1,24 @@
 package com.gatling.loadtest;
 
-import static io.gatling.javaapi.core.CoreDsl.*;
-import static io.gatling.javaapi.http.HttpDsl.*;
-
-import io.gatling.javaapi.core.*;
-import io.gatling.javaapi.http.*;
+import io.gatling.javaapi.core.ChainBuilder;
+import io.gatling.javaapi.core.CoreDsl;
+import io.gatling.javaapi.core.FeederBuilder;
+import io.gatling.javaapi.core.ScenarioBuilder;
+import io.gatling.javaapi.core.Simulation;
+import io.gatling.javaapi.http.HttpProtocolBuilder;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
+
+import static io.gatling.javaapi.core.CoreDsl.StringBody;
+import static io.gatling.javaapi.core.CoreDsl.css;
+import static io.gatling.javaapi.core.CoreDsl.feed;
+import static io.gatling.javaapi.core.CoreDsl.rampUsers;
+import static io.gatling.javaapi.core.CoreDsl.repeat;
+import static io.gatling.javaapi.core.CoreDsl.scenario;
+import static io.gatling.javaapi.core.CoreDsl.ssv;
+import static io.gatling.javaapi.core.CoreDsl.tryMax;
+import static io.gatling.javaapi.http.HttpDsl.http;
+import static io.gatling.javaapi.http.HttpDsl.status;
 
 
 /**
@@ -32,17 +44,25 @@ public class LoadTest extends Simulation {
     ChainBuilder post =
         tryMax(2).on(
             feed(post_feeder)
-            .exec(
-                http("Post")
-                    .post("/#{PATH}")
-                    .header(HttpHeaderNames.CONTENT_TYPE, String.valueOf(HttpHeaderValues.APPLICATION_JSON))
-                    .body(StringBody("#{BODY}"))
-                    .check(
-                        status().is(201)
-                    )
-            )
-            .pause(1)
-            .exitHereIfFailed()
+                .exec(session -> session.set("bodyVal", "#{BODY}"))
+                .exec(
+                    http("Post")
+                        .post("/#{PATH}")
+                        .header(HttpHeaderNames.CONTENT_TYPE, String.valueOf(HttpHeaderValues.APPLICATION_JSON))
+                        .body(StringBody("#{BODY}"))
+                        .check(
+                            status().is(201)
+                        )
+                )
+                .pause(1)
+                .exec(
+                    http("Validate Post")
+                        .get("/#{VALIDATE_PATH}")
+                        .check(
+                            CoreDsl.bodyString().isEL("#{BODY}")
+                        )
+                )
+                .exitHereIfFailed()
         );
 
     FeederBuilder<String> get_feeder = ssv("com/gatling/resources/load-test-get.csv").random();
@@ -59,12 +79,12 @@ public class LoadTest extends Simulation {
             ).pause(1)
         );
 
-    ScenarioBuilder users = scenario("Users").exec(browse, post);
+    ScenarioBuilder users = scenario("Users").exec(post);
     //ScenarioBuilder admins = scenario("Admins").exec(search, browse, edit);
 
     {
         setUp(
-            users.injectOpen(rampUsers(30).during(30))
+            users.injectOpen(rampUsers(2).during(4))
             //admins.injectOpen(rampUsers(2).during(10))
         ).protocols(httpProtocol);
     }
