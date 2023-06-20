@@ -18,7 +18,7 @@ import io.netty.handler.codec.http.HttpHeaderValues;
  * </ul>
  */
 public class LoadReplayTest extends Simulation {
-    FeederBuilder<String> feeder = ssv("com/gatling/resources/load-test.csv").circular();
+    FeederBuilder<String> feeder = ssv("com/gatling/resources/load-test.log").circular();
     // todo generate these test classes based on the input format
     HttpProtocolBuilder httpProtocol =
             http.baseUrl("http://0.0.0.0:8080")
