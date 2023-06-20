@@ -1,4 +1,4 @@
-PATH;BODY
-employees;{"id":1,"firstName":"Shuo","lastName":"Li","email":"Obfuscated@Obfuscated.com"}
-employees;{"id":2,"firstName":"Zi","lastName":"Yin","email":"Obfuscated@Obfuscated.com"}
-employees;{"id":3,"firstName":"Jane","lastName":"Doe","email":"Obfuscated@Obfuscated.com"}
+PATH;BODY;VALIDATE_PATH
+employees;{"id":1,"firstName":"Shuo","lastName":"Li","email":"Obfuscated@Obfuscated.com"};employees/1
+employees;{"id":2,"firstName":"Zi","lastName":"Yin","email":"Obfuscated@Obfuscated.com"};employees/2
+employees;{"id":3,"firstName":"Jane","lastName":"Doe","email":"Obfuscated@Obfuscated.com"};employees/3

@@ -1,13 +1,24 @@
 package com.gatling.loadtest;
 
-import static io.gatling.javaapi.core.CoreDsl.*;
-import static io.gatling.javaapi.core.CoreDsl.StringBody;
-import static io.gatling.javaapi.http.HttpDsl.*;
-
-import io.gatling.javaapi.core.*;
-import io.gatling.javaapi.http.*;
+import io.gatling.javaapi.core.ChainBuilder;
+import io.gatling.javaapi.core.Choice;
+import io.gatling.javaapi.core.CoreDsl;
+import io.gatling.javaapi.core.FeederBuilder;
+import io.gatling.javaapi.core.ScenarioBuilder;
+import io.gatling.javaapi.core.Simulation;
+import io.gatling.javaapi.http.HttpProtocolBuilder;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
+
+import static io.gatling.javaapi.core.CoreDsl.StringBody;
+import static io.gatling.javaapi.core.CoreDsl.exec;
+import static io.gatling.javaapi.core.CoreDsl.feed;
+import static io.gatling.javaapi.core.CoreDsl.rampUsers;
+import static io.gatling.javaapi.core.CoreDsl.scenario;
+import static io.gatling.javaapi.core.CoreDsl.ssv;
+import static io.gatling.javaapi.core.CoreDsl.tryMax;
+import static io.gatling.javaapi.http.HttpDsl.http;
+import static io.gatling.javaapi.http.HttpDsl.status;
 
 
 /**
@@ -32,15 +43,16 @@ public class LoadReplayTest extends Simulation {
     ChainBuilder edit =
             tryMax(2).on(
                     feed(feeder).doSwitch("#{METHOD}").on(
-                            Choice.withKey("GET", exec(http("Get or List").get("/"+"#{PATH}"))),
-                            Choice.withKey("POST", exec(http("Upsert user").post("/"+"#{PATH}")
-                                    .header(HttpHeaderNames.CONTENT_TYPE, String.valueOf(HttpHeaderValues.APPLICATION_JSON))
-                                    .body(StringBody("#{BODY}"))
-                                    .check(
-                                            status().is(201)
-                                    )
+                        Choice.withKey("GET", exec(http("Get or List").get("/" + "#{PATH}").check(status().is(200)))),
+                        Choice.withKey("POST", exec(http("Upsert user").post("/" + "#{PATH}")
+                                .header(HttpHeaderNames.CONTENT_TYPE, String.valueOf(HttpHeaderValues.APPLICATION_JSON))
+                                .body(StringBody("#{BODY}"))
+                                .check(
+                                    status().is(201)
+                                )
                             )
-                            ))
+                        ))
+                        .pause(1)
             );
 
     ScenarioBuilder users = scenario("Users").exec(edit);
